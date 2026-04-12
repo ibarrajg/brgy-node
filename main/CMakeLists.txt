@@ -8,5 +8,7 @@ idf_component_register(
         "lora_uart.cpp"
         "reception.cpp"
         "transmission.cpp"
+        "node_logic.cpp"
+        "loop_guard.cpp"
     INCLUDE_DIRS "."
     )

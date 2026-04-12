@@ -5,7 +5,11 @@
 extern "C" {
 #endif
 
-int reception_process(char *payload_out, char *raw_out);
+int reception_process(char *payload_out,
+                      char *raw_out,
+                      int *sender_id,
+                      int *dst_id,
+                      char *type_out);
 
 #ifdef __cplusplus
 }

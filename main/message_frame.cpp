@@ -5,7 +5,7 @@
 
 // ===== Hardcoded fields =====
 static const char *SRC  = "02";
-static const char *DST  = "02";
+static const char *DST  = "00";
 static const char *TYPE = "MSG";
 
 

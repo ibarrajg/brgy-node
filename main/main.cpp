@@ -6,6 +6,10 @@
 #include "lora_uart.h"
 #include "transmission.h"
 #include "reception.h"
+#include "node_logic.h"
+#include "loop_guard.h"
+
+#define NODE_ID 2 // This node's ID
 
 extern "C" void app_main(void)
 {
@@ -15,33 +19,46 @@ extern "C" void app_main(void)
 
     char payload[256];
     char raw[300];
-    static char last_raw[300] = "";
+    char type[4];
+    int sender_id;
+    int dst_id;
 
     while (1)
     {
-        // 🔹 TRANSMIT (user input)
-        if (transmission_process())
-        {
-            printf("Message sent\n\n\n");
-        }
+        transmission_process();
 
-        // 🔹 RECEIVE + REPEAT
-        if (reception_process(payload, raw))
+        if (reception_process(payload, raw, &sender_id, &dst_id, type))
         {
-            printf("Payload: %s\n", payload);
-
-            // 🔥 Prevent infinite loop
-            if (strcmp(raw, last_raw) != 0)
+            // Handle normal message packets
+            if (strcmp(type, "MSG") == 0)
             {
-                strcpy(last_raw, raw);
+                // Ignore my own message when it comes back through retransmission
+                if (sender_id != NODE_ID)
+                {
+                    if (loop_guard(raw))
+                    {
+                        handle_msg(payload, raw);
+                    }
+                }
+            }
 
-                // small delay before retransmit
-                vTaskDelay(100 / portTICK_PERIOD_MS);
+            // Handle acknowledgement packets
+            if (strcmp(type, "ACK") == 0)
+            {
+                // ACK is for this node
+                if (dst_id == NODE_ID)
+                {
+                    handle_ack(dst_id, payload, raw);
+                }
 
-                // 🔁 retransmit exact raw frame
-                lora_uart_send(raw);
-
-                printf("Retransmitting: %s\n\n\n", raw);
+                // ACK is not for this node
+                if (dst_id != NODE_ID)
+                {
+                    if (loop_guard(raw))
+                    {
+                        handle_ack(dst_id, payload, raw);
+                    }
+                }
             }
         }
 
