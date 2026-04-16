@@ -32,10 +32,9 @@ void lora_uart_send(const char *data)
 
 int lora_uart_receive(char *buffer, int max_len)
 {
-    int len = uart_read_bytes(LORA_UART, (uint8_t *)buffer, max_len - 1, 200 / portTICK_PERIOD_MS);
+    int len = uart_read_bytes(LORA_UART, (uint8_t *)buffer, max_len - 1, 50 / portTICK_PERIOD_MS);
 
     if (len > 0) {
-        buffer[len] = '\0';
         return len;
     }
 

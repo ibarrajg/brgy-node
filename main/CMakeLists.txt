@@ -10,5 +10,6 @@ idf_component_register(
         "transmission.cpp"
         "node_logic.cpp"
         "loop_guard.cpp"
+        "back_off_retry_logic.cpp"
     INCLUDE_DIRS "."
     )

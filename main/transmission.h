@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int transmission_process(void);
+int transmission_process(char *frame_out);
 
 #ifdef __cplusplus
 }

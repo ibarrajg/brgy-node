@@ -7,61 +7,84 @@
 #include "transmission.h"
 #include "reception.h"
 #include "node_logic.h"
-#include "loop_guard.h"
+#include "back_off_retry_logic.h"
 
-#define NODE_ID 2 // This node's ID
-
-extern "C" void app_main(void)
+static void transmission_task(void *pvParameters)
 {
-    printf("SYSTEM RUNNING\n");
+    char last_sent_frame[300];
 
-    lora_uart_init();
+    while (1)
+    {
+        if (transmission_process(last_sent_frame))
+        {
+            reset_ack_flag();
+            start_ack_wait(last_sent_frame);
+        }
 
+        if (is_waiting_for_ack() && is_ack_received())
+        {
+            stop_ack_wait();
+        }
+        else if (should_retry_ack(2000))
+        {
+            backoff_delay(1000, 3000);
+            lora_uart_send(get_retry_frame());
+            reset_ack_flag();
+            mark_retry_used();
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+static void reception_task(void *pvParameters)
+{
     char payload[256];
     char raw[300];
     char type[4];
     int sender_id;
     int dst_id;
+    int action;
 
     while (1)
     {
-        transmission_process();
-
         if (reception_process(payload, raw, &sender_id, &dst_id, type))
         {
-            // Handle normal message packets
-            if (strcmp(type, "MSG") == 0)
-            {
-                // Ignore my own message when it comes back through retransmission
-                if (sender_id != NODE_ID)
-                {
-                    if (loop_guard(raw))
-                    {
-                        handle_msg(payload, raw);
-                    }
-                }
-            }
+            action = handle_incoming_message(type, sender_id, dst_id, payload, raw);
 
-            // Handle acknowledgement packets
-            if (strcmp(type, "ACK") == 0)
+            if (action != ACTION_NONE)
             {
-                // ACK is for this node
-                if (dst_id == NODE_ID)
-                {
-                    handle_ack(dst_id, payload, raw);
-                }
-
-                // ACK is not for this node
-                if (dst_id != NODE_ID)
-                {
-                    if (loop_guard(raw))
-                    {
-                        handle_ack(dst_id, payload, raw);
-                    }
-                }
+                printf("%s\n", payload);
             }
         }
 
-        vTaskDelay(50 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
+}
+
+extern "C" void app_main(void)
+{
+    printf("BARANGAY NODE ACTIVE\n");
+
+    lora_uart_init();
+
+    xTaskCreatePinnedToCore(
+        transmission_task,
+        "tx_task",
+        4096,
+        NULL,
+        5,
+        NULL,
+        0
+    );
+
+    xTaskCreatePinnedToCore(
+        reception_task,
+        "rx_task",
+        4096,
+        NULL,
+        5,
+        NULL,
+        1
+    );
 }

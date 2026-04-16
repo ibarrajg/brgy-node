@@ -7,7 +7,7 @@
 #include "lora_uart.h"
 
 
-int transmission_process(void)
+int transmission_process(char *frame_out)
 {
     char msg[256];
     char frame[300];
@@ -21,8 +21,9 @@ int transmission_process(void)
         // Step 3: Send via LoRa UART
         lora_uart_send(frame);
 
-        //printf("sent: %s\n", frame); 
-
+        
+        strcpy(frame_out, frame);
+        
         return 1;
     }
 
