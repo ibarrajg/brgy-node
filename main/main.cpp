@@ -11,7 +11,7 @@
 
 static void transmission_task(void *pvParameters)
 {
-    char last_sent_frame[300];
+    char last_sent_frame[512];
 
     while (1)
     {
@@ -25,22 +25,22 @@ static void transmission_task(void *pvParameters)
         {
             stop_ack_wait();
         }
-        else if (should_retry_ack(2000))
+        else if (should_retry_ack(1000))
         {
-            backoff_delay(1000, 3000);
+            backoff_delay(1000, 2000);
             lora_uart_send(get_retry_frame());
             reset_ack_flag();
             mark_retry_used();
         }
 
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 }
 
 static void reception_task(void *pvParameters)
 {
-    char payload[256];
-    char raw[300];
+    char payload[512];
+    char raw[512];
     char type[4];
     int sender_id;
     int dst_id;
@@ -54,11 +54,11 @@ static void reception_task(void *pvParameters)
 
             if (action != ACTION_NONE)
             {
-                printf("%s\n", payload);
+                printf("%02d|%s\n", sender_id, payload);
             }
         }
 
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(5 / portTICK_PERIOD_MS);
     }
 }
 

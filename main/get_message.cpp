@@ -2,7 +2,7 @@
 #include <string.h>
 #include "get_message.h"
 
-#define MAX_MSG_LEN 256
+#define MAX_MSG_LEN 512
 int get_user_message(char *out_msg)
 {
     if (fgets(out_msg, MAX_MSG_LEN, stdin) != NULL)

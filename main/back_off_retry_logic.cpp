@@ -9,7 +9,7 @@
 static int waiting_for_ack = 0;
 static int retry_used = 0;
 static TickType_t ack_wait_start = 0;
-static char last_sent_frame[300] = "";
+static char last_sent_frame[512] = "";
 
 void start_ack_wait(const char *frame)
 {

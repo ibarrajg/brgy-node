@@ -4,7 +4,7 @@
 #include "crc.h"   // use shared CRC module
 
 // ===== Hardcoded fields =====
-static const char *SRC  = "02";
+static const char *SRC  = "02"; // This node's ID, hardcoded, change accordingly for each node in testing
 static const char *DST  = "00";
 static const char *TYPE = "MSG";
 
@@ -14,7 +14,7 @@ void create_message_frame(const char *input, char *output)
 {
     int len = strlen(input);
 
-    char temp[256];
+    char temp[512];
 
     // Build frame WITHOUT CRC
     // Format: SRC|DST|TYPE|LEN|<PAYLOAD>

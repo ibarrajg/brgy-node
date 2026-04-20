@@ -16,7 +16,7 @@ int parse_message_frame(const char *frame,
         return 0;
 
     // ===== 2. Remove { } =====
-    char inner[256];
+    char inner[512];
     strncpy(inner, frame + 1, len - 2);
     inner[len - 2] = '\0';
 
