@@ -6,7 +6,7 @@
     "--query-driver=**",
     "--compile-commands-dir=c:\\Users\\ibarr\\Desktop\\capstone\\capstone\\build"
   ],
-  "idf.currentSetup": "C:/Espressif/frameworks/esp-idf-v5.5.2/",
+  "idf.currentSetup": "C:\\esp\\v6.0\\esp-idf",
   "idf.flashType": "UART",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"

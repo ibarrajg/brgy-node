@@ -9,8 +9,8 @@
 
 int transmission_process(char *frame_out)
 {
-    char msg[512];
-    char frame[512];
+    char msg[300];
+    char frame[1024];
 
     // Step 1: Get user message
     if (get_user_message(msg)) {

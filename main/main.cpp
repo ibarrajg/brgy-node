@@ -11,7 +11,7 @@
 
 static void transmission_task(void *pvParameters)
 {
-    char last_sent_frame[512];
+    char last_sent_frame[1024];
 
     while (1)
     {

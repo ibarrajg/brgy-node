@@ -14,7 +14,7 @@ void create_message_frame(const char *input, char *output)
 {
     int len = strlen(input);
 
-    char temp[512];
+    char temp[1024];
 
     // Build frame WITHOUT CRC
     // Format: SRC|DST|TYPE|LEN|<PAYLOAD>

@@ -3,7 +3,7 @@
 
 int loop_guard(const char *raw_frame)
 {
-    static char last_raw[512] = "";
+    static char last_raw[1024] = "";
 
     // Only allow retransmission if this is not the same
     // as the last raw frame already handled

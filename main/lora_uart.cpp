@@ -10,17 +10,24 @@
 
 void lora_uart_init(void)
 {
-    uart_config_t uart_config = {
+    const uart_config_t uart_config = {
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
-        .parity    = UART_PARITY_DISABLE,
+        .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+#if ESP_IDF_VERSION_MAJOR >= 6
+        .source_clk = UART_SCLK_DEFAULT,
+#endif
     };
 
     uart_driver_install(LORA_UART, 1024, 0, 0, NULL, 0);
     uart_param_config(LORA_UART, &uart_config);
     uart_set_pin(LORA_UART, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+
+    uart_flush_input(LORA_UART);
+    vTaskDelay(pdMS_TO_TICKS(200));
+    uart_flush_input(LORA_UART);
 }
 
 
